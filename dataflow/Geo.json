@@ -19,11 +19,17 @@
 						"type": "LinkedServiceReference"
 					},
 					"name": "File"
+				},
+				{
+					"name": "WS"
 				}
 			],
 			"transformations": [
 				{
 					"name": "FranceOnly"
+				},
+				{
+					"name": "CitiesByCountry"
 				}
 			],
 			"scriptLines": [
@@ -46,6 +52,8 @@
 				"     format: 'table') ~> Geography",
 				"Geography split(CountryRegionCode=='FR',",
 				"     disjoint: false) ~> FranceOnly@(France, NonFrance)",
+				"FranceOnly@NonFrance aggregate(groupBy(CountryRegionCode),",
+				"     CitiesCount = count()) ~> CitiesByCountry",
 				"FranceOnly@France sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'delimited',",
@@ -60,7 +68,15 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> File"
+				"     skipDuplicateMapOutputs: true) ~> File",
+				"CitiesByCountry sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     store: 'synapse',",
+				"     databaseType: 'spark',",
+				"     format: 'table',",
+				"     database: 'default',",
+				"     tableName: 'CitiesByCountry',",
+				"     recreate:true) ~> WS"
 			]
 		}
 	}
