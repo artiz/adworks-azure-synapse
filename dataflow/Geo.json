@@ -1,0 +1,67 @@
+{
+	"name": "Geo",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AdWorksGeography",
+						"type": "DatasetReference"
+					},
+					"name": "Geography"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "azqstart-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "File"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FranceOnly"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          GeographyKey as integer,",
+				"          City as string,",
+				"          StateProvinceCode as string,",
+				"          StateProvinceName as string,",
+				"          CountryRegionCode as string,",
+				"          EnglishCountryRegionName as string,",
+				"          SpanishCountryRegionName as string,",
+				"          FrenchCountryRegionName as string,",
+				"          PostalCode as string,",
+				"          SalesTerritoryKey as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     limit: 100,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> Geography",
+				"Geography split(CountryRegionCode=='FR',",
+				"     disjoint: false) ~> FranceOnly@(France, NonFrance)",
+				"FranceOnly@France sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'fs1',",
+				"     folderPath: (\"synapse/workspaces/azqstart\"),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: false,",
+				"     filePattern:(toString(currentTimestamp())),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> File"
+			]
+		}
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-custstgacct--azqstart-azqstart",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/2cb412db-6578-4312-a1ca-b3e16c25ef33/resourceGroups/Sandbox/providers/Microsoft.Storage/storageAccounts/azqstart",
+		"groupId": "dfs",
+		"fqdns": [
+			"azqstart.dfs.core.windows.net"
+		]
+	}
+}

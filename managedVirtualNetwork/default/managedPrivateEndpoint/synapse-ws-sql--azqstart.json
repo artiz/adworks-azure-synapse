@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-sql--azqstart",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/2cb412db-6578-4312-a1ca-b3e16c25ef33/resourceGroups/Sandbox/providers/Microsoft.Synapse/workspaces/azqstart",
+		"groupId": "sql",
+		"fqdns": [
+			"azqstart.20cee580-70ed-4ebb-b0b6-b93d5f8722b8.sql.azuresynapse.net"
+		]
+	}
+}
