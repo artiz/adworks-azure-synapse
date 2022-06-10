@@ -30,6 +30,12 @@
 				},
 				{
 					"name": "CitiesByCountry"
+				},
+				{
+					"name": "CityLC"
+				},
+				{
+					"name": "windowCode"
 				}
 			],
 			"scriptLines": [
@@ -54,7 +60,12 @@
 				"     disjoint: false) ~> FranceOnly@(France, NonFrance)",
 				"FranceOnly@NonFrance aggregate(groupBy(CountryRegionCode),",
 				"     CitiesCount = count()) ~> CitiesByCountry",
-				"FranceOnly@France sink(allowSchemaDrift: true,",
+				"FranceOnly@France derive(CityLC = lower(replace(City, \" \", \"_\"))) ~> CityLC",
+				"CityLC window(over(City,",
+				"          GeographyKey),",
+				"     asc(City, true),",
+				"     PostalCode = first(PostalCode)) ~> windowCode",
+				"windowCode sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'delimited',",
 				"     fileSystem: 'fs1',",
@@ -63,7 +74,7 @@
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: false,",
-				"     filePattern:(toString(currentTimestamp())),",
+				"     filePattern:(toString(currentTimestamp()) + \".csv\"),",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
