@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'azqstart-WorkspaceDefaultSqlServer'"
 		},
+		"RestService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.github.com/search/repositories"
+		},
 		"azqstart-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://azqstart.dfs.core.windows.net"
@@ -24,6 +28,393 @@
 		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/works')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/All')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Geo",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Geo",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Geo')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyPipeline_1n0')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach_1n0",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_1n0",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "dbo.@{item().destination.table}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "SqlPoolSink",
+											"writeBehavior": "Insert",
+											"tableOption": "autoCreate"
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_1n0",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_1n0",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().destination.table"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "DatabaseLog"
+								},
+								"destination": {
+									"table": "DatabaseLog"
+								}
+							},
+							{
+								"source": {
+									"table": "DimAccount"
+								},
+								"destination": {
+									"table": "DimAccount"
+								}
+							},
+							{
+								"source": {
+									"table": "DimCurrency"
+								},
+								"destination": {
+									"table": "DimCurrency"
+								}
+							},
+							{
+								"source": {
+									"table": "DimCustomer"
+								},
+								"destination": {
+									"table": "DimCustomer"
+								}
+							},
+							{
+								"source": {
+									"table": "DimDate"
+								},
+								"destination": {
+									"table": "DimDate"
+								}
+							},
+							{
+								"source": {
+									"table": "DimDepartmentGroup"
+								},
+								"destination": {
+									"table": "DimDepartmentGroup"
+								}
+							},
+							{
+								"source": {
+									"table": "DimEmployee"
+								},
+								"destination": {
+									"table": "DimEmployee"
+								}
+							},
+							{
+								"source": {
+									"table": "DimGeography"
+								},
+								"destination": {
+									"table": "DimGeography"
+								}
+							},
+							{
+								"source": {
+									"table": "DimOrganization"
+								},
+								"destination": {
+									"table": "DimOrganization"
+								}
+							},
+							{
+								"source": {
+									"table": "DimProduct"
+								},
+								"destination": {
+									"table": "DimProduct"
+								}
+							},
+							{
+								"source": {
+									"table": "DimProductCategory"
+								},
+								"destination": {
+									"table": "DimProductCategory"
+								}
+							},
+							{
+								"source": {
+									"table": "DimProductSubcategory"
+								},
+								"destination": {
+									"table": "DimProductSubcategory"
+								}
+							},
+							{
+								"source": {
+									"table": "DimPromotion"
+								},
+								"destination": {
+									"table": "DimPromotion"
+								}
+							},
+							{
+								"source": {
+									"table": "DimReseller"
+								},
+								"destination": {
+									"table": "DimReseller"
+								}
+							},
+							{
+								"source": {
+									"table": "DimSalesReason"
+								},
+								"destination": {
+									"table": "DimSalesReason"
+								}
+							},
+							{
+								"source": {
+									"table": "DimSalesTerritory"
+								},
+								"destination": {
+									"table": "DimSalesTerritory"
+								}
+							},
+							{
+								"source": {
+									"table": "DimScenario"
+								},
+								"destination": {
+									"table": "DimScenario"
+								}
+							},
+							{
+								"source": {
+									"table": "FactCallCenter"
+								},
+								"destination": {
+									"table": "FactCallCenter"
+								}
+							},
+							{
+								"source": {
+									"table": "FactCurrencyRate"
+								},
+								"destination": {
+									"table": "FactCurrencyRate"
+								}
+							},
+							{
+								"source": {
+									"table": "FactFinance"
+								},
+								"destination": {
+									"table": "FactFinance"
+								}
+							},
+							{
+								"source": {
+									"table": "FactInternetSales"
+								},
+								"destination": {
+									"table": "FactInternetSales"
+								}
+							},
+							{
+								"source": {
+									"table": "FactInternetSalesReason"
+								},
+								"destination": {
+									"table": "FactInternetSalesReason"
+								}
+							},
+							{
+								"source": {
+									"table": "FactResellerSales"
+								},
+								"destination": {
+									"table": "FactResellerSales"
+								}
+							},
+							{
+								"source": {
+									"table": "FactSalesQuota"
+								},
+								"destination": {
+									"table": "FactSalesQuota"
+								}
+							},
+							{
+								"source": {
+									"table": "FactSurveyResponse"
+								},
+								"destination": {
+									"table": "FactSurveyResponse"
+								}
+							},
+							{
+								"source": {
+									"table": "ProspectiveBuyer"
+								},
+								"destination": {
+									"table": "ProspectiveBuyer"
+								}
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SourceDataset_1n0')]",
+				"[concat(variables('workspaceId'), '/datasets/DestinationDataset_1n0')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Geo')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Geo FLow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Geo",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Geography": {},
+									"File": {},
+									"WS": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/Geo')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/AdWorksGeography')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
@@ -86,6 +477,122 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/adworks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DestinationDataset_1n0')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				},
+				"sqlPool": {
+					"referenceName": "works",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/works')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GitHubSearch')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestService1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/RestService1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SourceDataset_1n0')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adworks",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/adworks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/BI_workspace1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "PowerBIWorkspace",
+				"typeProperties": {
+					"tenantID": "bc75dd2e-c507-4485-8ecf-bcd6b8fdce4f"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/RestService1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"q": {
+						"type": "string",
+						"defaultValue": "java"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -198,11 +705,17 @@
 								"type": "LinkedServiceReference"
 							},
 							"name": "File"
+						},
+						{
+							"name": "WS"
 						}
 					],
 					"transformations": [
 						{
 							"name": "FranceOnly"
+						},
+						{
+							"name": "CitiesByCountry"
 						}
 					],
 					"scriptLines": [
@@ -225,6 +738,8 @@
 						"     format: 'table') ~> Geography",
 						"Geography split(CountryRegionCode=='FR',",
 						"     disjoint: false) ~> FranceOnly@(France, NonFrance)",
+						"FranceOnly@NonFrance aggregate(groupBy(CountryRegionCode),",
+						"     CitiesCount = count()) ~> CitiesByCountry",
 						"FranceOnly@France sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'delimited',",
@@ -239,7 +754,15 @@
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> File"
+						"     skipDuplicateMapOutputs: true) ~> File",
+						"CitiesByCountry sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     store: 'synapse',",
+						"     databaseType: 'spark',",
+						"     format: 'table',",
+						"     database: 'default',",
+						"     tableName: 'CitiesByCountry',",
+						"     recreate:true) ~> WS"
 					]
 				}
 			},
@@ -255,6 +778,124 @@
 			"properties": {
 				"type": "ManagedIdentity",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/data exploration')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sandbox",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "6a42d568-a095-4f33-b966-df7dc4539f48"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/2cb412db-6578-4312-a1ca-b3e16c25ef33/resourceGroups/Sandbox/providers/Microsoft.Synapse/workspaces/azqstart/bigDataPools/sandbox",
+						"name": "sandbox",
+						"type": "Spark",
+						"endpoint": "https://azqstart.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sandbox",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from pyspark.sql import SparkSession \r\n",
+							"from pyspark.sql.types import * \r\n",
+							"\r\n",
+							"# Primary storage info \r\n",
+							"account_name = 'azqstart' \r\n",
+							"container_name = 'fs1' \r\n",
+							"relative_path = 'synapse/workspaces/azqstart/csv/' \r\n",
+							"\r\n",
+							"adls_path = 'abfss://%s@%s.dfs.core.windows.net/%s' % (container_name, account_name, relative_path) \r\n",
+							"print('Primary storage account path: ' + adls_path) \r\n",
+							"\r\n",
+							"# Read a csv file \r\n",
+							"csv_path = adls_path + 'in_domain_train.csv' \r\n",
+							"df_csv = spark.read.csv(csv_path, header = 'true') \r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_csv.head()"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
 			},
 			"dependsOn": []
 		},
@@ -278,6 +919,18 @@
 				"sparkVersion": "3.1",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "switzerlandnorth"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/works')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],

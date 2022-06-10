@@ -11,6 +11,9 @@
 		"azqstart-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://api.github.com/search/repositories"
+		},
 		"azqstart-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://azqstart.dfs.core.windows.net"
 		}
