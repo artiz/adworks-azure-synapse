@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Ingest Email Analitics",
+				"name": "Ingest Product Analitics",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -39,8 +39,21 @@
 						"type": "TabularTranslator",
 						"mappings": [
 							{
+								"source": {
+									"name": "ProductKey",
+									"type": "Int32"
+								},
 								"sink": {
-									"path": "$"
+									"path": "$.id"
+								}
+							},
+							{
+								"source": {
+									"name": "EnglishProductName",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$.name"
 								}
 							}
 						]
