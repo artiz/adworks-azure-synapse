@@ -1,0 +1,22 @@
+{
+	"name": "RestService1",
+	"properties": {
+		"parameters": {
+			"q": {
+				"type": "string",
+				"defaultValue": "java"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://api.github.com/search/repositories",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
