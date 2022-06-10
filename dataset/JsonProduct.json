@@ -1,0 +1,19 @@
+{
+	"name": "JsonProduct",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azqstart-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "synapse/workspaces/azqstart",
+				"fileSystem": "fs1"
+			}
+		},
+		"schema": {}
+	}
+}

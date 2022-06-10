@@ -57,7 +57,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "DestinationDataset_1n0",
+									"referenceName": "AdWorksDataset",
 									"type": "DatasetReference",
 									"parameters": {
 										"cw_table": "@item().destination.table"
