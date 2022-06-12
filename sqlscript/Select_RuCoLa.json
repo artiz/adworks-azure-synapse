@@ -1,0 +1,17 @@
+{
+	"name": "Select_RuCoLa",
+	"properties": {
+		"content": {
+			"query": "-- This is auto-generated code\nSELECT\n    TOP 10 *\nFROM\n    OPENROWSET(\n        BULK 'csv/in_domain_train.csv',\n        DATA_SOURCE ='files',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        FIRSTROW =2\n        -- HEADER_ROW=TRUE\n    ) \n    WITH (\n        id INT,\n        sentence VARCHAR(512) COLLATE Latin1_General_100_BIN2_UTF8\n    )\n    AS [result]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "TMP",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
